@@ -27,3 +27,14 @@ export interface IUserCreate{
     password: string | null,
     cPassword: string | null
 }
+
+export interface IPasswordReset{
+    password: string | null,
+    cPassword: string | null
+}
+
+export interface IAlert{
+    severity: "error" | "success" | "info" | "warning" | undefined,
+    message: string,
+    open: boolean,
+}

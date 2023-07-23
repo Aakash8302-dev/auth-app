@@ -18,13 +18,16 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
         })
 
         await user.save();
+
         res.status(200).json({
             message: "User Created",
             user
         })
 
-    }catch(error){
-        throw error
+    }catch(error:any){
+        res.status(500).json({
+            error: error.message
+        })
     }
 }
 
@@ -34,12 +37,12 @@ const getAllUsers = async(req: Request, res: Response):Promise<void> => {
         if(user){
             res.status(200).json(user)
         }else{
-            res.json({
-                message: "No Users found"
-            })
+           throw new Error("No Users found")
         }
-    } catch (error) {
-        throw error
+    } catch (error:any) {
+        res.status(500).json({
+            message: error.message
+        })
     }
 }
 
@@ -51,18 +54,18 @@ const deleteUser = async (req: Request, res: Response) => {
 
         if(user){
             await User.findByIdAndDelete(id);
-            res.json({
+            res.status(200).json({
                 "message": "User deleted Successfully"
             })
 
         }else{
-            res.json({
-                message: `User with id ${id} not found`
-            })
+            throw new Error(`User with id ${id} not found`)
         }
 
-    } catch (error) {
-        throw error
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message
+        })
     }
 }
 
@@ -74,10 +77,14 @@ const getUserById = async(req:Request, res: Response) => {
 
         if(user){
             res.json(user);
+        }else{
+            throw new Error(`User not found`)
         }
 
-    } catch (error) {
-        throw error
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message
+        })
     }
 }
 
@@ -99,14 +106,14 @@ const loginUser = async(req: Request, res: Response) => {
                 token
             })
         }else{
-            res.status(400).json({
-                message: `Incorrect Email or Password`
-            })
+            throw new Error("Incorrect email or password")
         }
         
 
-    } catch (error) {
-        throw error
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message
+        })
     }
 }
 

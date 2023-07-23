@@ -3,7 +3,6 @@ import User from "../models/userModel"
 import nodemailer from "nodemailer"
 import generateToken from '../utils/generateToken'
 
-
 const passwordEmailReset = async(req:Request, res: Response) => {
     try {
         const body = req.body;
@@ -30,23 +29,47 @@ const passwordEmailReset = async(req:Request, res: Response) => {
     
             transporter.sendMail(mailOptions, function(error, info){
                 if(error){
-                    res.status(400).send(error)
+                    throw new Error("Error sending mail... Try again")
                 }else{
-                    res.status(200).send("Email sent ")
+                    res.status(200).send({
+                        message: "Link to reset password has been sent to your email"
+                    })
                 }
             })
 
 
         }else{
-            res.status(400).json({
-                message: "User with email doesn't exist"
+            throw new Error("User with email doesn't exists")
+        }
+
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
+
+}
+
+const resetPassword = async(req:Request, res:Response) => {
+    try {
+
+        const userDetails = res.locals.user
+
+        const user = await User.findOne({_id: userDetails.id})
+        if(user){
+            user.password = req.body.newPassword
+            await user.save();
+
+            res.status(200).json({
+                message: "Password reset successful"
             })
         }
 
-    } catch (error) {
-        
+    } catch (error:any) {
+        res.status(500).json({
+            message: error.message
+        })
     }
-
 }
 
 const verifyToken = async(req:Request, res: Response) => {
@@ -86,4 +109,4 @@ const sendEmail = async(req:Request, res:Response) => {
 }   
 
 
-export {passwordEmailReset, verifyToken}
+export {passwordEmailReset, verifyToken, resetPassword}
