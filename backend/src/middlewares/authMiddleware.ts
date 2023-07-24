@@ -13,6 +13,7 @@ export class Authentication{
     
                         token = req.headers.authorization.split(' ')[1];
                         const decoded:any = jsonwebtoken.verify(token, process.env.JWT_SECRET || '');
+
                         res.locals.user = decoded;
     
                         if( role!=="any" && !role.includes(decoded.role)){
@@ -33,4 +34,5 @@ export class Authentication{
            
         }
     }
+
 }

@@ -29,9 +29,10 @@ const style = {
             display: "block",
             margin: "1rem"
         },
-        // '& .MuiInputBase-input':{
-        //     width: "100%"
-        // },
+    },
+    errorPage:{
+        textAlign: "center",
+        padding: "1rem"
     }
 }
 
@@ -104,57 +105,64 @@ const CreatePassword = () => {
     })
 
     if(status ==="loading") return <CircularProgress sx={{...style.loader}} />
-
     
    
   return (
     <Box sx={{...style.root}}>
-        <Box sx={{...style.formWrap}}>
-            <Typography variant="h5" sx={{textAlign: "center"}}>Create a new password</Typography>
-            <FormControl>
-                <OutlinedInput
-                    size="small"
-                    name="password"
-                    placeholder="Password"
-                    onChange={handleChange}
-                    value={values.password}
-                    type={showPassword.password ? "text" : "password"}
-                    {...errors? {error: (errors.password ? true : false), helpertext: errors.password} : false}
-                    endAdornment={
-                        <InputAdornment position="end">
-                            <IconButton
-                                name="password"
-                                onClick={handleShowPassword}
-                            >
-                                {showPassword.password ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                        </InputAdornment>
-                    }
-                />
-            </FormControl>
-            <FormControl>
-              <OutlinedInput
-                size="small"
-                name="cPassword"
-                placeholder="Correct Password"
-                onChange={handleChange}
-                value={values.cPassword}
-                type={showPassword.cPassword ? "text" : "password"}
-                {...errors? {error: (errors.cPassword ? true : false), helpertext: errors.cPassword} : false}
-                endAdornment={
-                    <InputAdornment position="end">
-                        <IconButton
-                            name="cPassword"
-                            onClick={handleShowPassword}
-                        >
-                            {showPassword.cPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                    </InputAdornment>
-                }
-            />
-            </FormControl>
-            <Button variant="contained" onClick={handleSubmit}>Reset</Button>
-        </Box>
+        {
+            status === "success" ? (
+                <Box sx={{...style.formWrap}}>
+                    <Typography variant="h5" sx={{textAlign: "center"}}>Create a new password</Typography>
+                    <FormControl>
+                        <OutlinedInput
+                            size="small"
+                            name="password"
+                            placeholder="Password"
+                            onChange={handleChange}
+                            value={values.password}
+                            type={showPassword.password ? "text" : "password"}
+                            {...errors? {error: (errors.password ? true : false), helpertext: errors.password} : false}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        name="password"
+                                        onClick={handleShowPassword}
+                                    >
+                                        {showPassword.password ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+                    </FormControl>
+                    <FormControl>
+                    <OutlinedInput
+                        size="small"
+                        name="cPassword"
+                        placeholder="Correct Password"
+                        onChange={handleChange}
+                        value={values.cPassword}
+                        type={showPassword.cPassword ? "text" : "password"}
+                        {...errors? {error: (errors.cPassword ? true : false), helpertext: errors.cPassword} : false}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    name="cPassword"
+                                    onClick={handleShowPassword}
+                                >
+                                    {showPassword.cPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                    </FormControl>
+                    <Button variant="contained" onClick={handleSubmit}>Reset</Button>
+                </Box>
+            ) : <Box sx={{...style.errorPage}}>
+                <Button type="button" variant="contained" onClick={()=> navigate('/')}>Go Back</Button>
+                <Typography variant="h5">You are not authorised</Typography>
+            </Box>
+        }
+        
     </Box>
   )
 }

@@ -1,4 +1,4 @@
-import React,{useState, ChangeEvent} from 'react'
+import {useState, ChangeEvent} from 'react'
 import {useMutation } from '@tanstack/react-query';
 import {Typography, Box, Button, InputAdornment, OutlinedInput, IconButton} from '@mui/material'
 import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
@@ -50,6 +50,14 @@ const PasswordResetForm = (props:Props) => {
                 open: true,
                 message: "Link to reset password has been sent"
             })
+
+            setTimeout(()=>{
+                setInfo({
+                    severity: undefined,
+                    open: false,
+                    message: ''
+                })
+            },2500)
         },
         onError: ({response}) => {
             setInfo({
@@ -57,6 +65,13 @@ const PasswordResetForm = (props:Props) => {
                 open: true,
                 message: response.data.error
             })
+            setTimeout(()=>{
+                setInfo({
+                    severity: "error",
+                    open: false,
+                    message: response.data.error
+                })
+            },2500)
         }
     })
 
