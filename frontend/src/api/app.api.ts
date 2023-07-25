@@ -23,4 +23,10 @@ const resetPassword = ({token,password}:IResetPass) => {
     }})
 }
 
-export {resetPasswordEmail, verifyToken, resetPassword}
+const getUserPermissions = (token:string, id:string) => {
+    return axios.get(`${uri}/route/${id}`, {headers:{
+        Authorization: `Bearer ${token}`
+    }})
+}
+
+export {resetPasswordEmail, verifyToken, resetPassword, getUserPermissions}

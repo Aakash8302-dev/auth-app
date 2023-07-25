@@ -1,16 +1,16 @@
 import express from 'express'
 import { createUser, getAllUsers, deleteUser, getUserById, loginUser} from "../controllers/userController";
-import { Authentication } from '../middlewares/authMiddleware';
+import { Authentication, dynamicProtect } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
 router.route('/')
-.get(Authentication.protect(["admin", "user"]), getAllUsers)
+.get(dynamicProtect, getAllUsers)
 .post(createUser);
 
 router.route('/:id')
-.delete(Authentication.protect(["admin"]),deleteUser)
-.get(Authentication.protect(["admin", "user"]),getUserById);
+.delete(dynamicProtect,deleteUser)
+.get(dynamicProtect,getUserById);
 
 router.route('/login').post(loginUser);
 

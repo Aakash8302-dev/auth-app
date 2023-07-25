@@ -105,8 +105,10 @@ const CreatePassword = () => {
     })
 
     if(status ==="loading") return <CircularProgress sx={{...style.loader}} />
-    
-   
+    if(status === "success"){
+        navigate('/reset');
+    }
+
   return (
     <Box sx={{...style.root}}>
         {

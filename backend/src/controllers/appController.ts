@@ -39,7 +39,7 @@ const passwordEmailReset = async(req:Request, res: Response) => {
 
 
         }else{
-            throw new Error("User with email doesn't exists")
+            throw new Error("Invalid email")
         }
 
     } catch (error:any) {

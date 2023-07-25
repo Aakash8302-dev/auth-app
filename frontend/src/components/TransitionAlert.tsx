@@ -16,7 +16,6 @@ interface Props{
 
 export default function TransitionAlert(props:Props) {
 
-
   return (
     <Box sx={{ width: '100%' }}>
       <Collapse in={props.info.open} >

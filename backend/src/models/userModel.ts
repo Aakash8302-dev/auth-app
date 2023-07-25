@@ -37,14 +37,6 @@ userSchema.pre('save', async function(this:IUser, next){
     this.password = await bcryptjs.hash(this.password, salt);
 })
 
-// userSchema.pre('updateOne', async function(this:IUser, next) {
-//     if(!this.isModified('password')){
-//         next();
-//     }
-//     const salt = await bcryptjs.genSalt(10);
-//     this.password = await bcryptjs.hash(this.password, salt);
-// })
-
 export default mongoose.model<IUserDocument>("User", userSchema);
 
 

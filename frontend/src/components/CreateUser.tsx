@@ -1,9 +1,10 @@
 import {ChangeEvent, useState, FormEvent} from "react"
 import { useMutation } from "@tanstack/react-query"
-import {Box, TextField, Typography,Button, FormControl, InputLabel, Select, MenuItem, FormHelperText} from "@mui/material"
+import {Box, TextField, Typography,Button, FormControl, InputLabel, Select, MenuItem, FormHelperText, ListItemText, OutlinedInput, Checkbox} from "@mui/material"
 import { IUserCreate } from "../types"
 import { createUser } from "../api"
 import { SelectChangeEvent } from "@mui/material/Select"
+import { useNavigate } from "react-router-dom"
 
 const styles = {
     formRoot:{
@@ -18,12 +19,20 @@ const styles = {
     }
 }
 
+const Permissions = [
+    'create User',
+    'Invalidate user',
+    "verify email"
+]
+
 const CreateUser = () => {
+
+  const navigate = useNavigate();
 
   const createUserMutation = useMutation({
     mutationFn: createUser,
     onSuccess: ()=>{
-        console.log("Created");
+        navigate('/home')
     }
 
   })
@@ -74,6 +83,18 @@ const CreateUser = () => {
     return Object.values(temp).every(x => x==="")
   }
 
+  const [userPermission, setUserPermission] = useState<string[]>([])
+
+  const handleMultipleSelect = (event: SelectChangeEvent<typeof Permissions>) => {
+    const {
+      target: { value },
+    } = event;
+    setUserPermission(
+        // On autofill we get a stringified value.
+        typeof value === 'string' ? value.split(',') : value,
+      );
+    };
+
   return (
     <>
         <Typography variant="h6">CREATE USER</Typography>
@@ -112,6 +133,27 @@ const CreateUser = () => {
                         <FormHelperText>{errors.role}</FormHelperText>
                     ) : null
                 }
+            </FormControl>
+            <FormControl sx={{marginTop: "1rem"}}>
+                <InputLabel id="userPermissionsSelect" size="small">Permissions</InputLabel>
+                <Select 
+                    labelId="userPermissionsSelect"
+                    size="small" 
+                    multiple
+                    onChange={handleMultipleSelect} 
+                    value={userPermission}
+                    input={<OutlinedInput label="Tag" />}
+                    renderValue={(selected) => selected.join(', ')}
+                >
+                    {
+                        Permissions.map((permission, index) => (
+                            <MenuItem key={permission} value={permission}>
+                                <Checkbox checked={userPermission.indexOf(permission) > -1} />
+                                <ListItemText primary={permission} />
+                            </MenuItem>
+                        ))
+                    }
+                </Select>
             </FormControl>
             <TextField
                 variant="outlined"

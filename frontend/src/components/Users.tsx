@@ -1,5 +1,5 @@
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
-import {Box, IconButton} from "@mui/material"
+import {Box, IconButton, Table, TableBody, TableCell, TableRow, TableHead} from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getAllUsers } from "../api"
 import { IUser } from "../types"
@@ -18,12 +18,13 @@ const styles = {
         alignItems: "center",
         userInfo:{
             minWidth:"80%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-Evenly"
+            row:{
+                minWidth: "5rem"
+            }
         }
     },
     deleteIcon:{
+        padding: "0",
         marginLeft: "auto"
     }
 }
@@ -52,27 +53,37 @@ const Users = () => {
   if(status === "loading") return <h4>Loading....</h4>
 
   return (
-    <div>
-        {
+    <Table>
+        <TableHead>
+            <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Role</TableCell>
+                <TableCell>Actions</TableCell>
+            </TableRow>
+        </TableHead>
+        <TableBody>
+        {   
             usersData?.data.map((user:IUser,index:number) => (
-                <Box key={index} sx={{...styles.userRoot}}>
-                    <Box sx={{...styles.userRoot.userInfo}}>
-                        <Box>{user.name}</Box>
-                        <Box>{user.email}</Box>
-                        <Box>{user.role}</Box>
-                    </Box>
-                    {
-                        userInfo && (userInfo.role==="admin") && userInfo.id !== user._id ? (
+                <TableRow key={index} sx={{...styles.userRoot.userInfo}}  >          
+       
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.role}</TableCell>
+                 {
+                    userInfo && (userInfo.role==="admin") && userInfo.id !== user._id ? (
+                        <TableCell>
                             <IconButton onClick={()=> userDeleteMutation.mutate(user._id)} sx={{...styles.deleteIcon}}>
                                 <DeleteIcon />
                             </IconButton>
-                        ): <Box></Box>
-                    }
-                    
-                </Box>
+                        </TableCell>
+                    ): <TableCell></TableCell>
+                 }
+                </TableRow>
             ))
         }
-    </div>
+        </TableBody>
+    </Table>
   )
 }
 

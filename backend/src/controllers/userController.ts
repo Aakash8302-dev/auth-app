@@ -1,10 +1,16 @@
 import express, { Request, Response } from 'express'
 import { IUser } from '../types';
 import User from '../models/userModel'
+import Route from '../models/routeModel'
 import generateToken from '../utils/generateToken';
 import nodemailer from 'nodemailer'
+import {ROUTE_TYPES, returnDefaultRoutes} from '../constants/index'
 import dotenv from "dotenv"
 dotenv.config();
+
+interface IDynamicRoutes {
+    [key:string]: string[]
+}
 
 const createUser = async (req: Request, res: Response): Promise<void> => {
     try{
@@ -18,6 +24,18 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
         })
 
         await user.save();
+
+        const routesAccessible = ROUTE_TYPES.reduce((result:IDynamicRoutes, key:string, index:number)=>{
+            result[key] = returnDefaultRoutes(user.role, key);
+            return result
+        },{})
+
+        const userPermissions  = new Route({
+            userId: user._id,
+            routesAccessible
+        })
+
+        userPermissions.save();
 
         res.status(200).json({
             message: "User Created",
@@ -51,15 +69,17 @@ const deleteUser = async (req: Request, res: Response) => {
         const id = req.params.id;
 
         const user = await User.findById(id);
+        const userPermissions = await Route.findOne({userId: id});
 
-        if(user){
+        if(user && userPermissions){
             await User.findByIdAndDelete(id);
+            await Route.findOneAndDelete({userId:id})
             res.status(200).json({
                 "message": "User deleted Successfully"
             })
 
         }else{
-            throw new Error(`User with id ${id} not found`)
+            throw new Error(`invalid user id`)
         }
 
     } catch (error:any) {
