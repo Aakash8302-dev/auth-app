@@ -19,7 +19,7 @@ export const deleteUser = (id:string) => {
     return axios.delete(`${uri}/${id}`, {headers:{Authorization: `Bearer ${userDetails?.token}`}});
 }
 
-export const createUser = ({name, role, email, password}: IUserCreate) => {
+export const createUser = ({name, role,email, password, permissions}:IUserCreate) => {
     const userDetails = getUser();
-    return axios.post(`${uri}/`, {name,role,email,password}, {headers:{Authorization: `Bearer ${userDetails?.token}`}});
+    return axios.post(`${uri}/`, {name,role,email,password, permissions}, {headers:{Authorization: `Bearer ${userDetails?.token}`}});
 }

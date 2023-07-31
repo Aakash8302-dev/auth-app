@@ -2,10 +2,12 @@ import {BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import LoginScreen from "./screens/LoginScreen"
 import HomeScreen from "./screens/HomeScreen"
 import CreatePassword from "./screens/CreatePassword"
+import UserProvider from "./contexts/userContext"
 
 const App = () => {
 
   return (
+    <UserProvider>
     <div>
       <Router>
         <Routes>
@@ -15,6 +17,7 @@ const App = () => {
         </Routes>
       </Router>
     </div>
+    </UserProvider>
   )
 }
 

@@ -1,3 +1,5 @@
+import { SelectProps } from "@mui/material"
+
 export interface ILogin{
     email:string | null,
     password:string | null
@@ -25,7 +27,8 @@ export interface IUserCreate{
     email: string | null,
     role: string | null,
     password: string | null,
-    cPassword: string | null
+    cPassword: string | null,
+    permissions: string[] | null | string
 }
 
 export interface IPasswordReset{

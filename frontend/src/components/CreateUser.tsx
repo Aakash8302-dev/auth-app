@@ -20,9 +20,7 @@ const styles = {
 }
 
 const Permissions = [
-    'create User',
-    'Invalidate user',
-    "verify email"
+    'PERMISSIONS_CREATE_USER'
 ]
 
 const CreateUser = () => {
@@ -34,7 +32,6 @@ const CreateUser = () => {
     onSuccess: ()=>{
         navigate('/home')
     }
-
   })
 
   const [formvalues, setFormValues] = useState({
@@ -42,7 +39,8 @@ const CreateUser = () => {
     email: "",
     role: "",
     password: "",
-    cPassword: ""
+    cPassword: "",
+    permissions: [""]
   })
 
   const [errors, setErrors] = useState<IUserCreate>()
@@ -56,18 +54,21 @@ const CreateUser = () => {
   }
 
   const handleSubmit = () => {
+    
         if(validate()){
             createUserMutation.mutate(formvalues)
         }
   }
 
   const validate = ():boolean => {
-    let temp:IUserCreate = {
+
+    let temp:IUserCreate= {
         name: null,
         email: null,
         role: null,
         password: null,
-        cPassword: null
+        cPassword: null,
+        permissions: null
     }
 
     temp.name = formvalues.name ? "" : "This Field is required"
@@ -75,24 +76,25 @@ const CreateUser = () => {
     temp.role = formvalues.role ? "" : "This field is required"
     temp.password = formvalues.password ? "" : "This field is required"
     temp.cPassword = formvalues.cPassword ? ( formvalues.password !== formvalues.cPassword ? "Passwords do not match" : "" ) : "This field is required"
+    temp.permissions = formvalues.permissions ? "" : ""
 
     setErrors({
         ...temp
     })
 
-    return Object.values(temp).every(x => x==="")
+    return Object.values(temp).every(x => x === "")
   }
-
-  const [userPermission, setUserPermission] = useState<string[]>([])
 
   const handleMultipleSelect = (event: SelectChangeEvent<typeof Permissions>) => {
     const {
       target: { value },
     } = event;
-    setUserPermission(
-        // On autofill we get a stringified value.
-        typeof value === 'string' ? value.split(',') : value,
-      );
+
+      setFormValues(() => ({
+        ...formvalues,
+        ["permissions"] : typeof value === 'string' ? value.split(',') : value,
+      }))
+
     };
 
   return (
@@ -141,14 +143,14 @@ const CreateUser = () => {
                     size="small" 
                     multiple
                     onChange={handleMultipleSelect} 
-                    value={userPermission}
+                    value={formvalues.permissions}
                     input={<OutlinedInput label="Tag" />}
                     renderValue={(selected) => selected.join(', ')}
                 >
                     {
                         Permissions.map((permission, index) => (
                             <MenuItem key={permission} value={permission}>
-                                <Checkbox checked={userPermission.indexOf(permission) > -1} />
+                                <Checkbox checked={formvalues.permissions.indexOf(permission) > -1} />
                                 <ListItemText primary={permission} />
                             </MenuItem>
                         ))

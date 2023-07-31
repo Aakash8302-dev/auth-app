@@ -5,37 +5,45 @@ import Route from '../models/routeModel'
 import generateToken from '../utils/generateToken';
 import nodemailer from 'nodemailer'
 import {ROUTE_TYPES, returnDefaultRoutes} from '../constants/index'
+import { ALL_PERMISSIONS, USER_DEFAULT_PERMISSIONS } from '../constants/permissions';
 import dotenv from "dotenv"
 dotenv.config();
 
-interface IDynamicRoutes {
-    [key:string]: string[]
-}
-
 const createUser = async (req: Request, res: Response): Promise<void> => {
     try{
-        const body:IUser = req.body;
+        const body = req.body;
         
         const user = new User({
             email: body.email,
             name: body.name,
             password: body.password,
-            role: body.role
+            role: body.role 
         })
 
-        await user.save();
+        let optionalPermissions = body.permissions
+        optionalPermissions = optionalPermissions.slice(1,);
+        const newUser = await user.save();
 
-        const routesAccessible = ROUTE_TYPES.reduce((result:IDynamicRoutes, key:string, index:number)=>{
-            result[key] = returnDefaultRoutes(user.role, key);
-            return result
-        },{})
+        let routesAccessible:string[] 
 
-        const userPermissions  = new Route({
-            userId: user._id,
-            routesAccessible
-        })
+        if(user.role === 'admin'){
+            routesAccessible = Object.keys(ALL_PERMISSIONS)
+        }else{
 
-        userPermissions.save();
+            console.log(optionalPermissions);
+
+            routesAccessible = Object.keys(USER_DEFAULT_PERMISSIONS) 
+            routesAccessible = optionalPermissions ? routesAccessible.concat(optionalPermissions) : routesAccessible
+        }
+
+        if(newUser){
+            const userPermissions  = new Route({
+                userId: user._id,
+                routesAccessible
+            })
+            await userPermissions.save();
+        }
+ 
 
         res.status(200).json({
             message: "User Created",
@@ -115,7 +123,7 @@ const loginUser = async(req: Request, res: Response) => {
         const user = await User.findOne({email: body.email});
 
         if(user && (await user.matchPassword(body.password))){
-            const token = generateToken(user, '30d');
+            const token = generateToken(user, '15m');
             res.json({
                 user:{
                     id :user._id,
@@ -137,4 +145,37 @@ const loginUser = async(req: Request, res: Response) => {
     }
 }
 
-export {createUser, getAllUsers, deleteUser, getUserById, loginUser}
+const createAdmin = async(req:Request, res:Response) => {
+
+    const body:IUser = req.body;
+        
+    const user = new User({
+        email: body.email,
+        name: body.name,
+        password: body.password,
+        role: body.role
+    })
+
+    await user.save();
+
+    let routesAccessible:string[] = []
+
+        if(user.role === "admin"){
+            routesAccessible = Object.keys(ALL_PERMISSIONS);
+        }
+
+        const userPermissions  = new Route({
+            userId: user._id,
+            routesAccessible
+        })
+
+        await userPermissions.save();
+
+        res.status(200).json({
+            message: "User Created",
+            user
+        })
+
+}
+
+export {createUser, getAllUsers, deleteUser, getUserById, loginUser, createAdmin}

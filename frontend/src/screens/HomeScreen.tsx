@@ -17,11 +17,14 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button'
 
+import { useQuery } from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom'
 import Users from '../components/Users';
 import CreateUser from '../components/CreateUser';
 import { getUser, removeUser } from '../api/storage';
 import { IUserDetails } from '../types';
+import { getUserPermissions } from '../api/route.api';
+import { UserContext } from '../contexts/userContext';
 
 const drawerWidth = 200;
 
@@ -69,6 +72,9 @@ export default function HomeScreen(props: Props) {
   const [component, setComponent] = React.useState(1);
   const [userDetails, setUserDetails] = React.useState<IUserDetails | undefined>(getUser());
 
+  // const {userPermissions} = React.useContext(UserContext)
+  
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -79,12 +85,22 @@ export default function HomeScreen(props: Props) {
     }
   },[userDetails])
 
+
+  const {data:permissionsData, status} = useQuery({
+    queryFn: () =>  getUserPermissions(),
+    queryKey:["userPermissions"]
+  })
+
+  if(status==="success"){
+    console.log(permissionsData?.data.routesAccessible.includes('PERMISSIONS_CREATE_USER'))
+  }
+
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
-        {(userDetails && userDetails.user.role === "admin" ? adminActions: userActions).map((action, index) => (
+        { (permissionsData?.data.routesAccessible.includes('PERMISSIONS_CREATE_USER') ? adminActions: userActions).map((action, index) => (
           <ListItem key={action.action} disablePadding>
             <ListItemButton onClick={()=>setComponent(action.id)}>
               <ListItemIcon>

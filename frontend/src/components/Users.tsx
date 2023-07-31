@@ -1,10 +1,12 @@
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query"
-import {Box, IconButton, Table, TableBody, TableCell, TableRow, TableHead} from "@mui/material"
+import {Box, IconButton, Table, TableBody, TableCell, TableRow, TableHead, Menu, MenuItem} from "@mui/material"
 import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { getAllUsers } from "../api"
 import { IUser } from "../types"
 import { deleteUser } from "../api";
 import { getUser } from "../api/storage";
+import { useState } from "react";
 
 
 const styles = {
@@ -34,6 +36,16 @@ const Users = () => {
 
  const userInfo = getUser()?.user
 
+ const [anchorE1, setAnchorE1] = useState<null | HTMLElement>(null);
+ const open = Boolean(anchorE1);
+ const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorE1(e.currentTarget)
+ }
+
+ const handleClose = () => {
+    setAnchorE1(null)
+ }
+
   const queryClient = useQueryClient();
  
   const {data:usersData, status,} = useQuery({
@@ -51,6 +63,7 @@ const Users = () => {
  
 
   if(status === "loading") return <h4>Loading....</h4>
+  if(status === "error") return <h4>Error</h4>
 
   return (
     <Table>
@@ -71,13 +84,13 @@ const Users = () => {
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.role}</TableCell>
                  {
-                    userInfo && (userInfo.role==="admin") && userInfo.id !== user._id ? (
-                        <TableCell>
-                            <IconButton onClick={()=> userDeleteMutation.mutate(user._id)} sx={{...styles.deleteIcon}}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </TableCell>
-                    ): <TableCell></TableCell>
+                   userInfo && (userInfo.role==="admin") && userInfo.id !== user._id ? (
+                    <TableCell>
+                        <IconButton onClick={()=> userDeleteMutation.mutate(user._id)} sx={{...styles.deleteIcon}}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </TableCell>
+                ): <TableCell></TableCell>
                  }
                 </TableRow>
             ))

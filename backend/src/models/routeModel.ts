@@ -2,10 +2,7 @@ import mongoose,{Schema, SchemaDefinitionProperty, mongo} from "mongoose";
 
 interface IRoute {
     userId: SchemaDefinitionProperty<string>,
-    routesAccessible:{
-        userRoutes: string[],
-        appRoutes: string[]
-    }
+    routesAccessible: string[]
 }
 
 const routeSchema = new Schema<IRoute>({
@@ -14,17 +11,9 @@ const routeSchema = new Schema<IRoute>({
         ref: 'User',
         required: true
     },
-    routesAccessible:{
-        userRoutes:[{
-            type:String
-        }],
-        appRoutes:[{
-            type:String
-        }],
-        routeRoutes:[{
-            type:String
-        }]
-    }
+    routesAccessible:[{
+        type: String
+    }]
 })
 
 export default mongoose.model<IRoute>('Route', routeSchema)

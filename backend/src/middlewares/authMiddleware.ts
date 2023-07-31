@@ -35,6 +35,40 @@ export class Authentication{
            
         }
     }
+
+
+    static dynamicProtect(route: string){
+        return async(req:Request, res:Response, next:NextFunction) => {    
+            try {
+                let token;
+                if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+                    token = req.headers.authorization.split(' ')[1];
+                    const routeType = req.baseUrl.split('/')[2] + "Routes";
+                    const decoded:any = jsonwebtoken.verify(token, process.env.JWT_SECRET || '');
+                    
+
+                    res.locals.user = decoded
+                    
+                    const userPermissions = await Route.findOne({userId: decoded.id});
+                    const routesAccessible = userPermissions?.routesAccessible
+                    // const routesAccessibleByType = routesAccessible?.[routeType as keyof typeof routesAccessible]
+
+                    if(routesAccessible?.includes(route)){
+                        next();
+                    }else{
+                        throw new Error("Not allowed");
+                    }
+                }
+                if(!token){
+                    throw new Error("Not authorized or no token")
+                }
+            } catch (error:any) {
+                res.status(500).json({
+                    error: error.message
+                })
+            }
+        }
+    }
 }
 
 export const dynamicProtect = async (req:Request, res: Response, next: NextFunction) => {
@@ -50,10 +84,8 @@ export const dynamicProtect = async (req:Request, res: Response, next: NextFunct
 
                     const userPermissions = await Route.findOne({userId: decoded.id})
                     const routesAccessible = userPermissions?.routesAccessible
-                    
-                    const routesByType = routesAccessible?.[routeType as keyof typeof routesAccessible ]
-
-                    if(routesByType?.includes(routeName)){
+                
+                    if(routesAccessible?.includes(routeName)){
                         res.locals.user = decoded
                         next();
                     }else{

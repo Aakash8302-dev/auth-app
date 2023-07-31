@@ -6,7 +6,7 @@ export function saveUser(user: IUserDetails){
     localStorage.setItem(USER_DETAILS_KEY, JSON.stringify(user))
 }
 
-export function getUser():IUserDetails| undefined {
+export function getUser():IUserDetails| undefined { 
     const user = localStorage.getItem(USER_DETAILS_KEY);
     return user ? JSON.parse(user) : undefined
 }
