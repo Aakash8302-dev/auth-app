@@ -20,8 +20,12 @@ export const ALL_PERMISSIONS = {
 }
 
 export const OPTIONAL_PERMISSIONS = [
-    {
+    {   
         value: 'PERMISSIONS_CREATE_USER',
         logicalTerm: 'Create User'
+    },
+    {
+        value: 'PERMISSIONS_DELETE_USER_BY_ID',
+        logicalTerm: 'Delete User'
     }
 ]

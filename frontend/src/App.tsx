@@ -8,7 +8,6 @@ const App = () => {
 
   return (
     <UserProvider>
-    <div>
       <Router>
         <Routes>
           <Route path="/" element={<LoginScreen />} />
@@ -16,7 +15,6 @@ const App = () => {
           <Route path="/reset" element={<CreatePassword />} />
         </Routes>
       </Router>
-    </div>
     </UserProvider>
   )
 }

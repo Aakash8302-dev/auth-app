@@ -73,7 +73,14 @@ const resetPassword = async(req:Request, res:Response) => {
 }
 
 const verifyToken = async(req:Request, res: Response) => {
-    res.status(200).json(res.locals.user);
+    try {
+        res.status(200).json(res.locals.user);
+    } catch (error:any) {
+        res.status(500).json({
+            error: error.message
+        })
+    }
+    
 }
 
 const sendEmail = async(req:Request, res:Response) => {

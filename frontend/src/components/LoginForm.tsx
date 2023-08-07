@@ -93,6 +93,13 @@ const LoginForm = (props:Props) => {
             message: response.data.error,
             open: true,
         })
+        setTimeout(()=>{
+            setInfo({
+                severity: "error",
+                message: response.data.error,
+                open: false
+            })
+        }, 2000)
     }
  })
 

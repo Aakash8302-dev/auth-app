@@ -54,15 +54,6 @@ const adminActions = [
     },
 ]
 
-const renderComponent = (component: number) => {
-    switch(component){
-        case 1:
-            return <Users />
-        case 2:
-            return <CreateUser />
-    }
-}
-
 export default function HomeScreen(props: Props) {
 
   const navigate = useNavigate();
@@ -92,8 +83,18 @@ export default function HomeScreen(props: Props) {
   })
 
   if(status==="success"){
-    console.log(permissionsData?.data.routesAccessible.includes('PERMISSIONS_CREATE_USER'))
+    // console.log(permissionsData?.data.routesAccessible.includes('PERMISSIONS_CREATE_USER'))
   }
+
+  const renderComponent = (component: number) => {
+    switch(component){
+        case 1:
+            return <Users setComponent={setComponent} />
+        case 2:
+            return <CreateUser setComponent={setComponent}  />
+    }
+}
+
 
   const drawer = (
     <div>

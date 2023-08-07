@@ -9,6 +9,10 @@ import { getUser } from "../api/storage";
 import { useState } from "react";
 
 
+interface componentProps {
+    setComponent: (value: number) => void
+}
+
 const styles = {
     userRoot:{
         backgroundColor: "#f0f0f0",
@@ -32,7 +36,7 @@ const styles = {
 }
 
 
-const Users = () => {
+const Users:React.FC<componentProps> = ({setComponent}) => {
 
  const userInfo = getUser()?.user
 

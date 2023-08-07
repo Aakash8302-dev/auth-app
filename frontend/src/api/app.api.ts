@@ -1,6 +1,9 @@
 import axios from 'axios'
+import { getUser } from './storage'
 
 const uri = `${import.meta.env.VITE_BACKEND_URI}/api/app`
+
+const user = getUser();
 
 interface IResetPass{
     token:string,
@@ -11,9 +14,9 @@ const resetPasswordEmail = (email:string) => {
     return axios.post(`${uri}/reset`, {email})
 }
 
-const verifyToken = (token:string) => {
+const verifyToken = () => {
     return axios.get(`${uri}/verify`,{headers:{
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${user?.token}`
     }})
 }
 

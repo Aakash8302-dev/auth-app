@@ -1,10 +1,11 @@
 import {ChangeEvent, useState, FormEvent} from "react"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import {Box, TextField, Typography,Button, FormControl, InputLabel, Select, MenuItem, FormHelperText, ListItemText, OutlinedInput, Checkbox} from "@mui/material"
 import { IUserCreate } from "../types"
 import { createUser } from "../api"
 import { SelectChangeEvent } from "@mui/material/Select"
 import { useNavigate } from "react-router-dom"
+import { getOptionalRoutes } from "../api/route.api"
 
 const styles = {
     formRoot:{
@@ -19,18 +20,32 @@ const styles = {
     }
 }
 
-const Permissions = [
-    'PERMISSIONS_CREATE_USER'
-]
+// const Permissions = [
+//     'PERMISSIONS_CREATE_USER'
+// ]
 
-const CreateUser = () => {
+interface componentProps {
+    setComponent : (value: number) => void
+}
 
-  const navigate = useNavigate();
+type IoptionalPermissions = {
+    value: string,
+    logicalTerm: string
+}
+
+const CreateUser:React.FC<componentProps> = ({setComponent}) => {
+
+  const [perm, setPerm] = useState<string[]>([])
+
+  const {data:optionalPermissions, status} = useQuery({
+    queryFn: getOptionalRoutes,
+    queryKey: ["OptionalRoutes"]
+  })
 
   const createUserMutation = useMutation({
     mutationFn: createUser,
-    onSuccess: ()=>{
-        navigate('/home')
+    onSuccess: () => {
+        setComponent(1);
     }
   })
 
@@ -54,10 +69,12 @@ const CreateUser = () => {
   }
 
   const handleSubmit = () => {
+
+    console.log(perm);
     
-        if(validate()){
-            createUserMutation.mutate(formvalues)
-        }
+        // if(validate()){
+        //     createUserMutation.mutate(formvalues)
+        // }
   }
 
   const validate = ():boolean => {
@@ -85,15 +102,22 @@ const CreateUser = () => {
     return Object.values(temp).every(x => x === "")
   }
 
-  const handleMultipleSelect = (event: SelectChangeEvent<typeof Permissions>) => {
-    const {
-      target: { value },
-    } = event;
+  const handleMultipleSelect = (event: SelectChangeEvent<typeof perm>) => {
+    const { target: {value}} = event;
 
-      setFormValues(() => ({
-        ...formvalues,
-        ["permissions"] : typeof value === 'string' ? value.split(',') : value,
-      }))
+    setPerm(
+        typeof value === 'string' ? value.split(',') : value,
+      );
+
+    // setFormValues(()=> ({
+    //     ...formvalues,
+
+    // }))
+
+    //   setFormValues(() => ({
+    //     ...formvalues,
+    //     ["permissions"] : ["hello"]
+    //   }))
 
     };
 
@@ -137,21 +161,28 @@ const CreateUser = () => {
                 }
             </FormControl>
             <FormControl sx={{marginTop: "1rem"}}>
-                <InputLabel id="userPermissionsSelect" size="small">Permissions</InputLabel>
+                <InputLabel id="userPermissionsSelect">Permissions</InputLabel>
                 <Select 
+                    label="Permissions"
                     labelId="userPermissionsSelect"
-                    size="small" 
                     multiple
                     onChange={handleMultipleSelect} 
-                    value={formvalues.permissions}
-                    input={<OutlinedInput label="Tag" />}
-                    renderValue={(selected) => selected.join(', ')}
+                    value={perm}
+                    renderValue={(selected) => {
+                        let selectedPermissions:string[] = []
+                        optionalPermissions?.data.map((permission:IoptionalPermissions) => {
+                            if(selected.includes(permission.value)){
+                                selectedPermissions.push(permission.logicalTerm);
+                            }
+                        })
+                        return selectedPermissions.join(', ')
+                    }}
                 >
                     {
-                        Permissions.map((permission, index) => (
-                            <MenuItem key={permission} value={permission}>
-                                <Checkbox checked={formvalues.permissions.indexOf(permission) > -1} />
-                                <ListItemText primary={permission} />
+                        optionalPermissions && optionalPermissions?.data.map((permission:IoptionalPermissions) => (
+                            <MenuItem key={permission.value} value={permission.value}>
+                                <Checkbox checked={perm.indexOf(permission.value) > -1} />
+                                <ListItemText primary={permission.logicalTerm} />
                             </MenuItem>
                         ))
                     }
